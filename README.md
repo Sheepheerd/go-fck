@@ -1,2 +1,2 @@
 # go-fck
-A BrainFck implimentation written in Go.
+A Brainfck implimentation written in Go.
