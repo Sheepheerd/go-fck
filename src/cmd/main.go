@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/Sheepheerd/go-fck/engine"
 )
 
 func main() {
@@ -45,4 +47,5 @@ func main() {
 	// Pass tokens to parser
 
 	// Generate AST from parser
+	engine.RunEngine()
 }
