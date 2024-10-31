@@ -3,10 +3,9 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"os"
-	"strings"
-
 	"github.com/Sheepheerd/go-fck/engine"
+	"github.com/Sheepheerd/go-fck/lexer"
+	"os"
 )
 
 func main() {
@@ -28,20 +27,27 @@ func main() {
 	}
 	defer file.Close()
 
-	reader := bufio.NewReader(file)
+	scanner := bufio.NewScanner(file)
+	var operators []rune
 
-	word, err := reader.ReadString(' ')
-	if err != nil {
-		fmt.Println("Error reading from the file:", err)
+	for scanner.Scan() {
+		line := scanner.Text()
+		for _, char := range line {
+			if char != ' ' {
+				operators = append(operators, char)
+			}
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		fmt.Println("Error reading the file:", err)
 		return
 	}
-	word = strings.TrimSpace(word)
-	fmt.Printf("The first word in the file is: '%s'\n", word)
-
-	// Read in input from file and remove white space
 
 	// Create lexer and call tokenize with the bf string of code
+	tokens := lexer.Tokenize(operators)
 
+	fmt.Println("Tokens:", tokens)
 	// Get back a slice of tokens
 
 	// Pass tokens to parser
