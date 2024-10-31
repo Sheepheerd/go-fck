@@ -13,6 +13,7 @@ go build -o "../$OUT_DIR/main" ./cmd/main.go
 
 if [ $? -eq 0 ]; then
 	echo "go-fck  built. Running it..."
+	cd .. 
 	"$OUT_DIR/main" $1
 else
 	echo "Build failed."

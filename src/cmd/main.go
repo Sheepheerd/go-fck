@@ -3,9 +3,10 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/Sheepheerd/go-fck/engine"
-	"github.com/Sheepheerd/go-fck/lexer"
 	"os"
+
+	"github.com/Sheepheerd/go-fck/lexer"
+	"github.com/Sheepheerd/go-fck/parser"
 )
 
 func main() {
@@ -50,8 +51,12 @@ func main() {
 	fmt.Println("Tokens:", tokens)
 	// Get back a slice of tokens
 
-	// Pass tokens to parser
+	parsedTokens, err := parser.Parse(tokens)
 
-	// Generate AST from parser
-	engine.RunEngine()
+	if err != nil {
+		fmt.Println("Problem parsing tokens")
+	}
+
+	fmt.Printf("parsedTokens: %v\n", parsedTokens)
+
 }
