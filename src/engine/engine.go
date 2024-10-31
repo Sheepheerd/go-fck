@@ -11,24 +11,24 @@ import (
 type Engine struct {
 	instructionPointer int
 	tapePointer        *list.Element
-	tape               list.List
+	tape               *list.List
 	stack              stack.Stack
 }
 
 func New() *Engine {
 	e := &Engine{
 		instructionPointer: 0,
-		tape:               *list.New(),
+		tape:               list.New(),
 		stack:              *stack.New(),
 	}
 
-	// Initialize the tape with a single cell and set tapePointer to point to it
 	e.tapePointer = e.tape.PushBack(byte(0))
 
 	return e
 }
 
 func (e *Engine) RunInstructions(parsedTokens []lexer.Token) {
+
 	for {
 		token := parsedTokens[e.instructionPointer]
 		switch token {
@@ -61,9 +61,6 @@ func (e *Engine) incramentInstructionPointer() {
 }
 
 func (e *Engine) incramentTapePointer() {
-	// Handle dynamically allocating the size of the tape
-	fmt.Println(e.tapePointer)
-	fmt.Println(e.tape.Back())
 	if e.tapePointer == e.tape.Back() {
 		e.tapePointer = e.tape.PushBack(byte(0))
 	} else {
@@ -72,7 +69,6 @@ func (e *Engine) incramentTapePointer() {
 }
 
 func (e *Engine) decramentTapePointer() {
-	// If we are at the head, stay at the head
 	if e.tapePointer != e.tape.Front() {
 		e.tapePointer = e.tapePointer.Prev()
 	}

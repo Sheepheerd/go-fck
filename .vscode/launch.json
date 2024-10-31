@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch go-fck Debug",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/src/cmd/main.go",
+            "args": ["test.bf"],
+            "env": {},
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}
