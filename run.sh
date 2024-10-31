@@ -10,7 +10,7 @@ go build -o "$OUT_DIR/main" ./src/cmd/main.go
 
 if [ $? -eq 0 ]; then
     echo "go-fck  built. Running it..."
-    "$OUT_DIR/main"
+    "$OUT_DIR/main" $1
 else
     echo "Build failed."
     exit 1
