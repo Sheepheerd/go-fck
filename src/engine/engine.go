@@ -1,8 +1,10 @@
 package engine
 
 import (
+	"bufio"
 	"container/list"
 	"fmt"
+	"os"
 
 	"github.com/Sheepheerd/go-fck/lexer"
 	"github.com/Sheepheerd/go-fck/stack"
@@ -12,14 +14,14 @@ type Engine struct {
 	instructionPointer int
 	tapePointer        *list.Element
 	tape               *list.List
-	stack              stack.Stack
+	stack              *stack.Stack
 }
 
 func New() *Engine {
 	e := &Engine{
 		instructionPointer: 0,
 		tape:               list.New(),
-		stack:              *stack.New(),
+		stack:              stack.New(),
 	}
 
 	e.tapePointer = e.tape.PushBack(byte(0))
@@ -28,6 +30,8 @@ func New() *Engine {
 }
 
 func (e *Engine) RunInstructions(parsedTokens []lexer.Token) {
+
+	reader := bufio.NewReader(os.Stdin) // pass this in eventually
 
 	for {
 		token := parsedTokens[e.instructionPointer]
@@ -47,6 +51,8 @@ func (e *Engine) RunInstructions(parsedTokens []lexer.Token) {
 		case lexer.LeftBracket:
 		case lexer.RightBracket:
 		case lexer.Comma:
+			e.putCellValue(*reader)
+			e.incramentInstructionPointer()
 		case lexer.Period:
 			e.printCellValue()
 			e.incramentInstructionPointer()
@@ -92,4 +98,15 @@ func (e *Engine) decramentCell() {
 
 func (e *Engine) printCellValue() {
 	fmt.Println(e.tapePointer.Value)
+}
+
+func (e *Engine) putCellValue(reader bufio.Reader) {
+	nextByte, err := reader.ReadByte()
+
+	if err != nil {
+		fmt.Println("Could not read data")
+		return
+	}
+
+	e.tapePointer.Value = nextByte
 }
