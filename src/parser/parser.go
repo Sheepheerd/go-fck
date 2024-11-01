@@ -30,11 +30,11 @@ func hasValidSquareBraces(toks []lexer.Token) bool {
 
 	s := stack.New()
 
-	for _, tok := range toks {
+	for addr, tok := range toks {
 
 		if tok == lexer.LeftBracket {
 			fmt.Println("pushed")
-			s.Push("go") // this is dumb
+			s.Push("go")
 		} else if tok == lexer.RightBracket {
 			s.Pop()
 			fmt.Println("popped")

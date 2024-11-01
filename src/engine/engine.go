@@ -74,6 +74,11 @@ func (e *Engine) incramentTapePointer() {
 	}
 }
 
+func (e *Engine) handleLeftBracket() {
+	// check condition
+	// if cell is 0 -> jmp to after next curly brace -> need
+}
+
 func (e *Engine) decramentTapePointer() {
 	if e.tapePointer != e.tape.Front() {
 		e.tapePointer = e.tapePointer.Prev()
