@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Sheepheerd/go-fck/engine"
 	"github.com/Sheepheerd/go-fck/lexer"
 	"github.com/Sheepheerd/go-fck/parser"
 )
@@ -51,12 +52,16 @@ func main() {
 	fmt.Println("Tokens:", tokens)
 	// Get back a slice of tokens
 
-	parsedTokens, err := parser.Parse(tokens)
+	parsedTokens, symbolTable, err := parser.Parse(tokens)
 
+	fmt.Printf("symbolTable: %v\n", symbolTable)
 	if err != nil {
 		fmt.Println("Problem parsing tokens")
 	}
 
 	fmt.Printf("parsedTokens: %v\n", parsedTokens)
 
+	// Pass parsed tokens into engine
+
+	engine.New().RunInstructions(parsedTokens, symbolTable)
 }

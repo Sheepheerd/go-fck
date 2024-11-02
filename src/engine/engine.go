@@ -29,7 +29,7 @@ func New() *Engine {
 	return e
 }
 
-func (e *Engine) RunInstructions(parsedTokens []lexer.Token) {
+func (e *Engine) RunInstructions(parsedTokens []lexer.Token, symbolTable map[string]int) {
 
 	reader := bufio.NewReader(os.Stdin) // pass this in eventually
 
@@ -49,7 +49,9 @@ func (e *Engine) RunInstructions(parsedTokens []lexer.Token) {
 			e.decramentCell()
 			e.incramentInstructionPointer()
 		case lexer.LeftBracket:
+			e.handleLeftBracket()
 		case lexer.RightBracket:
+			e.handleRightBracket()
 		case lexer.Comma:
 			e.putCellValue(*reader)
 			e.incramentInstructionPointer()
@@ -75,6 +77,11 @@ func (e *Engine) incramentTapePointer() {
 }
 
 func (e *Engine) handleLeftBracket() {
+	// check condition
+	// if cell is 0 -> jmp to after next curly brace -> need
+}
+
+func (e *Engine) handleRightBracket() {
 	// check condition
 	// if cell is 0 -> jmp to after next curly brace -> need
 }
