@@ -29,12 +29,20 @@ func New() *Engine {
 	return e
 }
 
-func (e *Engine) RunInstructions(parsedTokens []lexer.Token, symbolTable map[string]int) {
+func (e *Engine) RunInstructions(parsedTokens []lexer.Token, symbolTable map[int]int) {
 
 	reader := bufio.NewReader(os.Stdin) // pass this in eventually
 
+	fmt.Println()
+	fmt.Println()
+	fmt.Println()
+
 	for {
+
 		token := parsedTokens[e.instructionPointer]
+		// e.printTape()
+
+		// fmt.Println("Processing symbol: ", token)
 		switch token {
 		case lexer.LessThan:
 			e.decramentTapePointer()
@@ -49,9 +57,9 @@ func (e *Engine) RunInstructions(parsedTokens []lexer.Token, symbolTable map[str
 			e.decramentCell()
 			e.incramentInstructionPointer()
 		case lexer.LeftBracket:
-			e.handleLeftBracket()
+			e.handleLeftBracket(symbolTable)
 		case lexer.RightBracket:
-			e.handleRightBracket()
+			e.handleRightBracket(symbolTable)
 		case lexer.Comma:
 			e.putCellValue(*reader)
 			e.incramentInstructionPointer()
@@ -60,12 +68,28 @@ func (e *Engine) RunInstructions(parsedTokens []lexer.Token, symbolTable map[str
 			e.incramentInstructionPointer()
 		}
 
+		if e.instructionPointer == len(parsedTokens) {
+			break
+		}
+
 	}
 
+	// e.printTape()
 }
 
 func (e *Engine) incramentInstructionPointer() {
 	e.instructionPointer++
+}
+
+func (e *Engine) printTape() {
+	cur := e.tape.Front()
+
+	for cur != nil {
+		fmt.Printf("-|%d|-", cur.Value)
+		cur = cur.Next()
+	}
+
+	fmt.Println() // newline
 }
 
 func (e *Engine) incramentTapePointer() {
@@ -76,14 +100,31 @@ func (e *Engine) incramentTapePointer() {
 	}
 }
 
-func (e *Engine) handleLeftBracket() {
-	// check condition
-	// if cell is 0 -> jmp to after next curly brace -> need
+func (e *Engine) handleLeftBracket(symbolTable map[int]int) {
+
+	// fmt.Println("Checking loop...")
+
+	if e.tapePointer.Value.(byte) == byte(0) {
+		// fmt.Println("skipping loop bc cur cell is 0")
+		e.instructionPointer = symbolTable[e.instructionPointer] + 1
+
+	} else {
+		// fmt.Println("Entering loop")
+		e.incramentInstructionPointer()
+	}
+
 }
 
-func (e *Engine) handleRightBracket() {
-	// check condition
-	// if cell is 0 -> jmp to after next curly brace -> need
+func (e *Engine) handleRightBracket(symbolTable map[int]int) {
+
+	// fmt.Println("Checking end of loop")
+	if e.tapePointer.Value.(byte) == byte(0) {
+		// fmt.Println("Exiting loop")
+		e.incramentInstructionPointer()
+	} else {
+		// fmt.Println("Moving instr ptr back")
+		e.instructionPointer = symbolTable[e.instructionPointer] + 1
+	}
 }
 
 func (e *Engine) decramentTapePointer() {
@@ -109,7 +150,7 @@ func (e *Engine) decramentCell() {
 }
 
 func (e *Engine) printCellValue() {
-	fmt.Println(e.tapePointer.Value)
+	fmt.Printf("%c", e.tapePointer.Value)
 }
 
 func (e *Engine) putCellValue(reader bufio.Reader) {
