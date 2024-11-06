@@ -54,14 +54,12 @@ func main() {
 
 	parsedTokens, symbolTable, err := parser.Parse(tokens)
 
-	fmt.Printf("symbolTable: %v\n", symbolTable)
 	if err != nil {
 		fmt.Println("Problem parsing tokens")
 	}
 
 	fmt.Printf("parsedTokens: %v\n", parsedTokens)
 
-	// Pass parsed tokens into engine
-
 	engine.New().RunInstructions(parsedTokens, symbolTable)
+
 }
