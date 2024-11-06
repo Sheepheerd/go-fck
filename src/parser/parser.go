@@ -2,7 +2,6 @@ package parser
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/Sheepheerd/go-fck/lexer"
 	"github.com/Sheepheerd/go-fck/stack"
@@ -12,36 +11,39 @@ var (
 	ErrInvalidSyntax = errors.New("invalid syntax error")
 )
 
-func Parse(toks []lexer.Token) ([]lexer.Token, error) {
-
-	isValid := hasValidSquareBraces(toks)
-
-	fmt.Printf("isValid: %v\n", isValid)
-
-	if !isValid {
-		return nil, ErrInvalidSyntax
+func Parse(toks []lexer.Token) ([]lexer.Token, map[int]int, error) {
+	symbolTable, err := createSymbolTable(toks)
+	if err != nil {
+		return nil, nil, ErrInvalidSyntax
 	}
 
-	return toks, nil
+	return toks, symbolTable, nil
 
 }
 
-func hasValidSquareBraces(toks []lexer.Token) bool {
+func createSymbolTable(toks []lexer.Token) (map[int]int, error) {
 
 	s := stack.New()
+	awaitingTokenAddresses := stack.New()
 
-	for _, tok := range toks {
+	symbolTable := make(map[int]int)
+
+	for addr, tok := range toks {
 
 		if tok == lexer.LeftBracket {
-			fmt.Println("pushed")
-			s.Push("go") // this is dumb
+			awaitingTokenAddresses.Push(addr)
+			symbolTable[addr] = -1
+			s.Push("go")
 		} else if tok == lexer.RightBracket {
+			var tokenAddress int = awaitingTokenAddresses.Pop().(int)
+			symbolTable[tokenAddress] = addr
+			symbolTable[addr] = tokenAddress
 			s.Pop()
-			fmt.Println("popped")
 		}
-
+	}
+	if s.Size() != 0 {
+		return nil, ErrInvalidSyntax
 	}
 
-	return s.Size() == 0
-
+	return symbolTable, nil
 }
