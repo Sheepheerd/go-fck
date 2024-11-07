@@ -60,6 +60,18 @@ func main() {
 
 	fmt.Printf("parsedTokens: %v\n", parsedTokens)
 
+	// if bfc, write to file
+
+	// // need to support -o [filename]
+	// f, err := os.Create("output.bin.bf")
+	// if err != nil {
+	// 	fmt.Println("Could not create output file")
+	// 	return
+	// }
+
+	// // might want a sync
+	// f.Write(parsedTokens)
+
 	engine.New().RunInstructions(parsedTokens, symbolTable)
 
 }
