@@ -1,5 +1,12 @@
 package lexer
 
+import (
+	"bufio"
+	"errors"
+	"fmt"
+	"os"
+)
+
 type Token int
 
 var tokens []Token
@@ -39,4 +46,37 @@ func Tokenize(tokensSlice []rune) []Token {
 		}
 	}
 	return tokens
+}
+
+var (
+	ErrCouldNotLex = errors.New("could not lex operators")
+)
+
+func LexOperators(f *os.File) ([]rune, error) {
+
+	// reset scanner from previous bin file check
+	_, err := f.Seek(0, 0)
+	if err != nil {
+		fmt.Println("Error resetting file cursor:", err)
+		return nil, ErrCouldNotLex
+	}
+
+	scanner := bufio.NewScanner(f)
+	var operators []rune
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		for _, char := range line {
+			if char != ' ' {
+				operators = append(operators, char)
+			}
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		fmt.Println("Error reading the file:", err)
+		return nil, ErrCouldNotLex
+	}
+
+	return operators, nil
 }

@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/Sheepheerd/go-fck/engine"
 	"github.com/Sheepheerd/go-fck/lexer"
@@ -29,49 +30,43 @@ func main() {
 	}
 	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
-	var operators []rune
+	if isBinFile(file) {
+		fmt.Println("Got bin file")
 
-	for scanner.Scan() {
-		line := scanner.Text()
-		for _, char := range line {
-			if char != ' ' {
-				operators = append(operators, char)
-			}
+	} else {
+		fmt.Println("Got regular file")
+
+		// reset scanner from bin file check
+
+		operators, err := lexer.LexOperators(file)
+		if err != nil {
+			fmt.Println(err.Error())
+			return
 		}
+		tokens := lexer.Tokenize(operators)
+
+		parsedTokens, symbolTable, err := parser.Parse(tokens)
+		if err != nil {
+			fmt.Println("Problem parsing tokens")
+		}
+
+		engine.New().RunInstructions(parsedTokens, symbolTable)
 	}
+
+}
+
+func isBinFile(f *os.File) bool {
+	scanner := bufio.NewScanner(f)
+
+	var stLine string
+	if scanner.Scan() {
+		stLine = scanner.Text()
+	}
+	fmt.Printf("stLine: %v\n", stLine)
 
 	if err := scanner.Err(); err != nil {
-		fmt.Println("Error reading the file:", err)
-		return
+		fmt.Println("Error reading file:", err)
 	}
 
-	// Create lexer and call tokenize with the bf string of code
-	tokens := lexer.Tokenize(operators)
-
-	fmt.Println("Tokens:", tokens)
-	// Get back a slice of tokens
-
-	parsedTokens, symbolTable, err := parser.Parse(tokens)
-
-	if err != nil {
-		fmt.Println("Problem parsing tokens")
-	}
-
-	fmt.Printf("parsedTokens: %v\n", parsedTokens)
-
-	// if bfc, write to file
-
-	// // need to support -o [filename]
-	// f, err := os.Create("output.bin.bf")
-	// if err != nil {
-	// 	fmt.Println("Could not create output file")
-	// 	return
-	// }
-
-	// // might want a sync
-	// f.Write(parsedTokens)
-
-	engine.New().RunInstructions(parsedTokens, symbolTable)
-
+	return strings.HasPrefix(stLine, "symbolTable=")
 }
