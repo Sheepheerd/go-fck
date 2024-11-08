@@ -3,6 +3,7 @@ package parser
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/Sheepheerd/go-fck/lexer"
@@ -25,6 +26,32 @@ func (s *SymbolTable) Serialize() string {
 	}
 
 	return builder.String()
+}
+
+// gotta move this into a proper symbol table package eventually, should be its own type anyway
+func DeserializeSymbolTable(input string) map[int]int {
+	result := make(map[int]int)
+
+	input = strings.TrimPrefix(input, "symbolTable=")
+
+	pairs := strings.Split(input, " ")
+
+	for _, pair := range pairs {
+		values := strings.Split(pair, ":")
+		if len(values) != 2 {
+			continue
+		}
+
+		key, err1 := strconv.Atoi(values[0])
+		value, err2 := strconv.Atoi(values[1])
+		if err1 != nil || err2 != nil {
+			continue
+		}
+
+		result[key] = value
+	}
+
+	return result
 }
 
 func (t *Tokens) Serialize() string {

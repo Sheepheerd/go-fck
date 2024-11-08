@@ -30,13 +30,38 @@ func main() {
 	}
 	defer file.Close()
 
-	if isBinFile(file) {
+	var engineSymbols []lexer.Token
+	var symbolTable map[int]int
+
+	isBin := isBinFile(file)
+
+	// reset scanner from previous bin file check
+	_, err = file.Seek(0, 0)
+	if err != nil {
+		fmt.Println("Error resetting file cursor:", err)
+	}
+
+	if isBin {
 		fmt.Println("Got bin file")
+
+		scanner := bufio.NewScanner(file)
+
+		var stData string
+		if scanner.Scan() {
+			stData = scanner.Text()
+		}
+
+		symbolTable = parser.DeserializeSymbolTable(stData)
+
+		var instrData string
+		if scanner.Scan() {
+			instrData = scanner.Text()
+		}
+		operators := []rune(instrData)
+		engineSymbols = lexer.Tokenize(operators)
 
 	} else {
 		fmt.Println("Got regular file")
-
-		// reset scanner from bin file check
 
 		operators, err := lexer.LexOperators(file)
 		if err != nil {
@@ -45,14 +70,14 @@ func main() {
 		}
 		tokens := lexer.Tokenize(operators)
 
-		parsedTokens, symbolTable, err := parser.Parse(tokens)
+		engineSymbols, symbolTable, err = parser.Parse(tokens)
 		if err != nil {
 			fmt.Println("Problem parsing tokens")
 		}
 
-		engine.New().RunInstructions(parsedTokens, symbolTable)
 	}
 
+	engine.New().RunInstructions(engineSymbols, symbolTable)
 }
 
 func isBinFile(f *os.File) bool {
