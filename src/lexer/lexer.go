@@ -53,14 +53,6 @@ var (
 )
 
 func LexOperators(f *os.File) ([]rune, error) {
-
-	// reset scanner from previous bin file check
-	_, err := f.Seek(0, 0)
-	if err != nil {
-		fmt.Println("Error resetting file cursor:", err)
-		return nil, ErrCouldNotLex
-	}
-
 	scanner := bufio.NewScanner(f)
 	var operators []rune
 

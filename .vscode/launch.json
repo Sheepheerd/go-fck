@@ -6,8 +6,8 @@
             "type": "go",
             "request": "launch",
             "mode": "debug",
-            "program": "${workspaceFolder}/src/cmd/main.go",
-            "args": ["test.bf"],
+            "program": "${workspaceFolder}/src/cmd/bfc/bfc.go",
+            "args": ["test.bf","fib.bf", "linkme.bf", "-o", "output.bf"],
             "env": {},
             "cwd": "${workspaceFolder}"
         }

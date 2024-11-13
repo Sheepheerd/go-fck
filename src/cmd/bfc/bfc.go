@@ -1,53 +1,62 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 
 	"github.com/Sheepheerd/go-fck/lexer"
+	"github.com/Sheepheerd/go-fck/linker"
 	"github.com/Sheepheerd/go-fck/parser"
 )
 
 func main() {
 	// all bfc needs to do, is take a -o, lex, parse, and save output
 
-	// bf in.bf -o out
-	// this is a bad way to do this, but works for now
-	// if os.Args[2] != "-o" {
-	// 	fmt.Println("Only supported flag is -o")
-	// 	return
-	// }
+	outFileIndex := len(os.Args) - 1
+	dashOIndex := len(os.Args) - 2
 
-	// if len(os.Args) != 2 {
-	// 	fmt.Println("Bad args")
-	// 	return
-	// }
+	if os.Args[dashOIndex] != "-o" {
+		fmt.Println("Bad output flag")
+		return
+	}
 
-	inputFileName := os.Args[1]
-	fmt.Printf("inputFileName: %v\n", inputFileName)
-	outputFileName := os.Args[3]
+	outputFileName := os.Args[outFileIndex]
 
 	fmt.Printf("outputFileName: %v\n", outputFileName)
 
-	file, err := os.Open(inputFileName)
-	if err != nil {
-		fmt.Println("Error opening the file:", err)
+	inputFileCount := dashOIndex - 1
+	if inputFileCount < 1 {
+		fmt.Println("No input files provided")
 		return
 	}
-	defer file.Close()
+
+	files := make([]*os.File, inputFileCount)
+
+	for i := 0; i < inputFileCount; i++ {
+		file, err := os.Open(os.Args[i+1])
+		if err != nil {
+			fmt.Println("Error opening the file:", err)
+			return
+		}
+		defer file.Close()
+		files[i] = file
+	}
+
+	fmt.Printf("all input files: %v\n", files)
+
+	// Link files
+	linkedFile, err := linker.Link(files)
+	if err != nil {
+		fmt.Println("Link error")
+		os.Exit(0)
+	}
+	defer linker.CleanObjectFiles() // todo make this configurable
 
 	// should be moved to lexer
-	scanner := bufio.NewScanner(file)
-	var operators []rune
-
-	for scanner.Scan() {
-		line := scanner.Text()
-		for _, char := range line {
-			if char != ' ' {
-				operators = append(operators, char)
-			}
-		}
+	operators, err := lexer.LexOperators(linkedFile)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
 	}
 
 	tokens := lexer.Tokenize(operators)
