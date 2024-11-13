@@ -10,11 +10,10 @@ import (
 
 type Node string
 
-func (this *Node) linkNode() string {
-	lines := strings.Split(string(*this), "\n")
+func (node *Node) linkNode() string {
+	lines := strings.Split(string(*node), "\n")
 
-	// should refactor for string builder at some point
-	outputOfMyLink := ""
+	var outputOfMyLink strings.Builder
 
 	for _, line := range lines {
 		if strings.HasPrefix(line, "#exec") {
@@ -27,16 +26,14 @@ func (this *Node) linkNode() string {
 				os.Exit(0)
 			}
 
-			node := Node(string(content[:]))
-
+			node := Node(content[:])
 			line = node.linkNode()
 		}
 
-		outputOfMyLink += line
-
+		outputOfMyLink.WriteString(line)
 	}
 
-	return outputOfMyLink
+	return outputOfMyLink.String()
 }
 
 func Link(files []*os.File) (*os.File, error) {
@@ -55,7 +52,6 @@ func Link(files []*os.File) (*os.File, error) {
 
 	linkedFileContent := mainFile.linkNode()
 
-	// todo fixme
 	return WriteStringToFile(linkedFileContent)
 }
 
