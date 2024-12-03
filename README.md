@@ -1,7 +1,7 @@
 <div align="center">
 
 #  Go-Fck
-A Brainfck implementation in written in Go
+A Brainfck implementation written in Go
 
 <img src="./img/go-fck.png" alt="gopher" width="250" height="250">
 </div>
