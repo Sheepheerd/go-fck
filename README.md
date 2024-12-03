@@ -38,4 +38,5 @@ interpretters
 - Golang >= `1.23.3`
 - Probably Linux
 
-
+### How to Build
+Use build.sh
